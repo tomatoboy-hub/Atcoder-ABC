@@ -20,7 +20,7 @@ for items in dic.values():
     l = -1
     r = 10 ** 10
     for item in items:
-        if item[0] == "L":
+        if item[1] == "L":
             l = max(l,item[0])
         if item[1] == "R":
             r = min(r,item[0])
