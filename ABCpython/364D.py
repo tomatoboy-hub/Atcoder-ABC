@@ -1,29 +1,23 @@
-import sys
 import bisect
 
 N,Q = map(int,input().split())
 A = list(map(int,input().split()))
-
-queries = []
-for j in range(Q):
-    b,k = map(int,input().split())
-    queries.append((b, k))
-
-# Sort A
 A.sort()
-
-results = []
-for b, k in queries:
-    # Calculate distances and sort
-    distances = []
-    for a in A:
-        distance = abs(a - b)
-        distances.append(distance)
+for _ in range(Q):
+    b,k = map(int,input().split())
+    """
+    二分探索でBj + x のxを求めに行けばいいのか? 
+    """
+    left = -1
+    right = 10 ** 9
+    b_idx = bisect.bisect_left(A,b)
+    while right - left > 1:
+        mid = (left + right) // 2
+        max_idx = bisect.bisect_right(A,b+mid)
+        min_idx = bisect.bisect_left(A,b-mid)
+        if (max_idx - min_idx) >= k:
+            right= mid
+        else:
+            left = mid
+    print(right)
     
-    distances.sort()
-    result = distances[k - 1]
-    results.append(result)
-
-for result in results:
-    print(result)
-

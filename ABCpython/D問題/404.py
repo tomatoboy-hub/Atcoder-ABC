@@ -1,56 +1,42 @@
-from itertools import product
+# O(N)解法の例
+# この解法は、DPの考え方を文字列操作に適用したものです
 
-N, M = map(int, input().split())
-C = list(map(int, input().split()))
+def solve():
+    N = int(input())
+    S = input()
 
-# 各動物がどの動物園で見られるかの情報を入力
-zoos = [[] for _ in range(N)]
-for i in range(M):
-    data = list(map(int, input().split()))
-    for zoo in data[1:]:
-        zoos[zoo - 1].append(i)
-ans = 10 ** 20
-"""
-# 各動物園を0回, 1回, 2回訪れる組み合わせを生成
-for visits in product(range(3), repeat=N):
-    seen = [0] * M
-    temp = 0
-    for i, visit_count in enumerate(visits):
-        for _ in range(visit_count):
-            for animal in zoos[i]:
-                seen[animal] += 1
-        temp += C[i] * visit_count
-    # すべての動物が2回以上見られるか確認
+    if N <= 1:
+        print(S)
+        return
 
-    if all(count >= 2 for count in seen):
-        ans = min(ans, temp)
-"""
-comb_list = []
-v = []
-def dfs(v):
-    global comb_list
-    if len(v) == N:
-        print(v)
-        comb_list.append(v.copy())
+    # dp[i] は S[i:] に対する答え
+    # 後ろから計算する
+    dp = [""] * N
+    dp[N-1] = S[N-1]
 
-        return 
-    for i in range(3):
-        v.append(i)
-        dfs(v)
-        v.pop()
-dfs(v)
+    for i in range(N - 2, -1, -1):
+        # Case 1: S[i]を動かさない場合
+        # この場合、答えのプレフィックスはS[i]で、残りはS[i+1:]の最適解
+        cand1 = S[i] + dp[i+1]
 
-
-for visits in comb_list:
-    seen = [0] * M
-    temp = 0
-    for i, visit_count in enumerate(visits):
-        for _ in range(visit_count):
-            for animal in zoos[i]:
-                seen[animal] += 1
-        temp += C[i] * visit_count
-    if all(count >= 2 for count in seen):
-        ans = min(ans, temp)
+        # Case 2: S[i]を動かす場合
+        # この場合、S[i+1]が先頭に来る。S[i]をどこに挿入するのがベストか？
+        # S[i]とdp[i+1]を比較する
+        if S[i] < dp[i+1]:
+            # S[i]の方が小さいなら、S[i]を前に持ってくるべき（つまり動かさない）
+            # なので、cand1がこのケースを包含している
+            cand2 = cand1
+        else: # S[i] >= dp[i+1]
+            # S[i]を動かした方が良い可能性がある
+            # 実際には、S[i]をdp[i+1]の中に挿入して最小の文字列を作る
+            # しかし、単純にS[i]とdp[i+1]を入れ替えた文字列と比較するだけで十分
+            cand2 = dp[i+1] + S[i]
         
+        dp[i] = min(cand1, cand2)
 
-print(ans)
+    print(dp[0])
+
+# --- メインの実行部分 ---
+T = int(input())
+for _ in range(T):
+    solve()
